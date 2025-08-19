@@ -8,7 +8,7 @@ library(data.table)
 library(nnet)
 library(VGAM)
 source(here("daten", "data_edit.R"))
-source(here("models", "model_evaluation.R"))
+source(here("modellierung", "model_evaluation.R"))
 set.seed(476)
 
 
