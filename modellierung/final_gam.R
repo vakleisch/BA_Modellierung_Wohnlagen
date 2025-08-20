@@ -52,7 +52,7 @@ gam_model_zentral <- gam(
 )
 
 # Modell speichern
-saveRDS(gam_model_zentral, file = "modell_outputs/gam_model_zentral.rds")
+# saveRDS(gam_model_zentral, file = "modelle/gam_model_zentral.rds")
 
 
 
@@ -90,7 +90,7 @@ gam_model_ausserhalb <- gam(
 )
 
 # Modell speichern
-# saveRDS(gam_model_ausserhalb, file = "modell_outputs/gam_model_ausserhalb.rds")
+# saveRDS(gam_model_ausserhalb, file = "modelle/gam_model_ausserhalb.rds")
 
 
 
@@ -125,4 +125,5 @@ gam_model_zentral_ohne <- gam(
 )
 
 # Modell speichern
-# saveRDS(gam_model_zentral_ohne, file = "modell_outputs/gam_model_zentral_ohne.rds")
+# saveRDS(gam_model_zentral_ohne, file = "modelle/gam_model_zentral_ohne.rds")
+
