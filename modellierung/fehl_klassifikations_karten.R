@@ -12,8 +12,8 @@ source(here("modellierung", "model_evaluation.R"))
 source(here("daten", "data_edit.R"))
 
 # Modelle einlesen
-model_gam_zentral <- readRDS("modell_outputs/gam_model_zentral.rds")
-model_gam_ausserhalb <- readRDS("modell_outputs/gam_model_ausserhalb.rds")
+model_gam_zentral <- readRDS("modelle/gam_model_zentral.rds")
+model_gam_ausserhalb <- readRDS("modelle/gam_model_ausserhalb.rds")
 
 # Daten laden
 load("daten/model_data_zentral_complete.RData")

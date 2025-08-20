@@ -20,9 +20,9 @@ options(scipen = 999) # Verhindert wissenschaftliche Notation in ggplot2
 
 
 # Modelle laden
-model_gam_zentral <- readRDS("modell_outputs/gam_model_zentral.rds") 
-model_gam_ausserhalb <- readRDS("modell_outputs/gam_model_ausserhalb.rds")
-model_gam_zentral_ohne <- readRDS("modell_outputs/gam_model_zentral_ohne.rds")
+model_gam_zentral <- readRDS("modelle/gam_model_zentral.rds") 
+model_gam_ausserhalb <- readRDS("modelle/gam_model_ausserhalb.rds")
+model_gam_zentral_ohne <- readRDS("modelle/gam_model_zentral_ohne.rds")
 
 # Daten laden
 load("daten/model_data_zentral_complete.RData")
