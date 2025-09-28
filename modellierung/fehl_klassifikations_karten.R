@@ -685,3 +685,65 @@ interaktive_karte_complete
 # Speichern als html
 # saveWidget(interaktive_karte_complete, file = "interaktive_karten/interaktive_karte_complete.html", selfcontained = TRUE)
 # browseURL("interaktive_karten/interaktive_karte_complete.html")
+
+
+
+
+
+# Experiment
+# Interaktive Karte mit den Korrekten und Falschen
+interaktive_karte_model_e <- leaflet() %>%
+  setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  # Wohnlagen hinzufügen – jetzt die transformierte Version!
+  addPolygons(data = wohnlagen_muc_wgs,
+              fillColor = ~wohnlagen_muc_wgs$color,
+              fillOpacity = 0.6,
+              color = "black",
+              weight = 0.5,
+              label = ~Wohnlage) %>%
+  addCircleMarkers(
+    data = fehler_model_gam_kombiniert_wgs,
+    fillColor = fehler_model_gam_kombiniert_wgs$color,
+    fillOpacity = 1,
+    color = "red",
+    stroke = TRUE,
+    weight = 1,
+    radius = 4,
+    label = ~Wohnlage_vorhersage,
+    popup = ~paste0(
+      "<b>Distanz Bahnhof:</b> ", distanz_bahnhof, "<br>",
+      "<b>Distanz U-Bahn:</b> ", distanz_ubahn, "<br>",
+      "<b>Distanz Bus:</b> ", distanz_bushaltestelle, "<br>",
+      "<b>Distanz Unterzentrum:</b> ", distanz_unterzentrum, "<br>",
+      "<b>Distanz Mittelzentrum:</b> ", distanz_mittelzentrum, "<br>",
+      "<b>Nahversorgungsindex:</b> ", nahversorgungs_index, "<br>",
+      "<b>Hauspreisindex:</b> ", hauspreis_index, "<br>",  
+      "<b>Straßentyp:</b> ", straßentyp_gruppe, "<br>"
+    ),
+    group = "Fehler"
+  ) %>%
+  addCircleMarkers(
+    data = korrekt_model_gam_kombiniert_wgs,
+    fillColor = korrekt_model_gam_kombiniert_wgs$color,
+    fillOpacity = 1,
+    color = "black",
+    stroke = TRUE,
+    weight = 1,
+    radius = 4,
+    label = ~Wohnlage,
+    group = "Korrekt"
+  ) %>%
+  # Optional: Grenzen (transformiert)
+  addPolylines(data = wohnlage_grenzen_wgs, color = "black", weight = 0.5)%>% 
+  addLegend(
+    position = "bottomright",
+    colors = wohnlage_farben,
+    labels = names(wohnlage_farben),
+    title = "Wohnlage",
+    opacity = 1
+  ) %>%
+  addLayersControl(overlayGroups = c("Fehler", "Korrekt"),
+                   options = layersControlOptions(collapsed = FALSE))
+# anschauen
+interaktive_karte_model_e

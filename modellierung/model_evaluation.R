@@ -379,3 +379,45 @@ korrekte_vorhersagen_ausserhalb <- function(model,
   
   return(korrekte_klassifikationen)
 }
+
+
+korrekte_vorhersagen <- function(model,
+                                            data = model_data_ausserhalb_complete,
+                                            y_col = "Wohnlage_numerisch",
+                                            number_categories = 3,
+                                            predict_fun = predict_labels_discr) {
+  predicted_classes <- predict_fun(model = model, test_data = data,
+                                   number_categories = number_categories, y_col = y_col)
+  
+  if (length(predicted_classes) != nrow(data)) {
+    stop("Länge der Vorhersagen passt nicht zur Anzahl der Datenzeilen.")
+  }
+  
+  Wohnlage_vorhersage <- factor(predicted_classes, levels = as.character(0:(number_categories - 1)))
+  Wohnlage_wahr <- factor(data[[y_col]], levels = as.character(0:(number_categories - 1)))
+  
+  data <- data.frame(data, Wohnlage_wahr, Wohnlage_vorhersage)
+  
+  # Nur korrekt klassifizierte Zeilen behalten
+  korrekte_klassifikationen <- data[
+    as.character(data$Wohnlage_wahr) == as.character(data$Wohnlage_vorhersage),
+  ]
+  
+  korrekte_klassifikationen <- korrekte_klassifikationen %>%
+    mutate(
+      Wohnlage_wahr = case_when(
+        Wohnlage_wahr == 0 ~ "durchschnittliche Lage",
+        Wohnlage_wahr == 1 ~ "gute Lage",
+        Wohnlage_wahr == 2 ~ "beste Lage"
+      ),
+      Wohnlage_vorhersage = case_when(
+        Wohnlage_vorhersage == 0 ~ "durchschnittliche Lage",
+        Wohnlage_vorhersage == 1 ~ "gute Lage",
+        Wohnlage_vorhersage == 2 ~ "beste Lage"
+      ),
+      Wohnlage_wahr = factor(Wohnlage_wahr, levels = c("durchschnittliche Lage", "gute Lage", "beste Lage")),
+      Wohnlage_vorhersage = factor(Wohnlage_vorhersage, levels = c("durchschnittliche Lage", "gute Lage", "beste Lage"))
+    )
+  
+  return(korrekte_klassifikationen)
+}
