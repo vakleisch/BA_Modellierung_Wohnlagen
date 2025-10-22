@@ -264,10 +264,12 @@ straßentyp_danach_zentral <- ggplot(model_data_zentral_complete, aes(x = straß
   labs(x = "Straßentyp", y = "Proportion", fill = "Wohnlage") +
   coord_flip(clip = "off") +
   theme_minimal() +
-  theme(legend.position = "None",
+  theme(legend.position = "none", 
         text = element_text(size = 16.5),
         plot.margin = margin(5.5, 30, 5.5, 5.5))
-
+ggsave("plots/straßentyp_danach_zentral.png", 
+       plot = straßentyp_danach_zentral,
+       width = 10, height = 4, dpi = 300)
 
 # davor
 abs_counts_4 <- create_abs_counts(model_data_mit_stra_zentral_complete, straßentyp)
@@ -300,6 +302,11 @@ straßentyp_danach_ausserhalb <- ggplot(model_data_ausserhalb_complete, aes(x = 
   theme(legend.position = "None",
         text = element_text(size = 16.5),
         plot.margin = margin(5.5, 30, 5.5, 5.5))
+
+#speichern
+ggsave("plots/straßentyp_danach_ausserhalb.png", 
+       plot = straßentyp_danach_ausserhalb,
+       width = 10, height = 4, dpi = 300)
 
 
 # davor

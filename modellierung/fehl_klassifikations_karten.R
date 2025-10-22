@@ -14,6 +14,7 @@ source(here("daten", "data_edit.R"))
 # Modelle einlesen
 model_gam_zentral <- readRDS("modelle/gam_model_zentral.rds")
 model_gam_ausserhalb <- readRDS("modelle/gam_model_ausserhalb.rds")
+model_gam_zentral_ohne_preis <- readRDS("modelle/gam_model_zentral_ohne_preis.rds")
 
 # Daten laden
 load("daten/model_data_zentral_complete.RData")
@@ -64,6 +65,7 @@ korrekt_model_gam_zentral <- korrekte_vorhersagen_zentral(model_gam_zentral,
 korrekt_model_gam_ausserhalb <- korrekte_vorhersagen_ausserhalb(model_gam_ausserhalb, 
                                                                  data = model_data_ausserhalb_complete,
                                                                  predict_fun = predict_labels_discr)
+
 # mit gleicher priori
 fehler_model_gam_zentral_prior <- missclassification_data_zentral(model_gam_zentral, 
                                                                    data = model_data_zentral_complete,
@@ -718,7 +720,8 @@ interaktive_karte_model_e <- leaflet() %>%
       "<b>Distanz Unterzentrum:</b> ", distanz_unterzentrum, "<br>",
       "<b>Distanz Mittelzentrum:</b> ", distanz_mittelzentrum, "<br>",
       "<b>Nahversorgungsindex:</b> ", nahversorgungs_index, "<br>",
-      "<b>Hauspreisindex:</b> ", hauspreis_index, "<br>",  
+      "<b>Hauspreisindex:</b> ", hauspreis_index, "<br>", 
+      "<b> ÖPNV-Index:</b> ", opnv_index, "<br>",
       "<b>Straßentyp:</b> ", straßentyp_gruppe, "<br>"
     ),
     group = "Fehler"
@@ -732,6 +735,17 @@ interaktive_karte_model_e <- leaflet() %>%
     weight = 1,
     radius = 4,
     label = ~Wohnlage,
+    popup = ~paste0(
+      "<b>Distanz Bahnhof:</b> ", distanz_bahnhof, "<br>",
+      "<b>Distanz U-Bahn:</b> ", distanz_ubahn, "<br>",
+      "<b>Distanz Bus:</b> ", distanz_bushaltestelle, "<br>",
+      "<b>Distanz Unterzentrum:</b> ", distanz_unterzentrum, "<br>",
+      "<b>Distanz Mittelzentrum:</b> ", distanz_mittelzentrum, "<br>",
+      "<b>Nahversorgungsindex:</b> ", nahversorgungs_index, "<br>",
+      "<b>Hauspreisindex:</b> ", hauspreis_index, "<br>", 
+      "<b> ÖPNV-Index:</b> ", opnv_index, "<br>",
+      "<b>Straßentyp:</b> ", straßentyp_gruppe, "<br>"
+    ),
     group = "Korrekt"
   ) %>%
   # Optional: Grenzen (transformiert)
@@ -747,3 +761,6 @@ interaktive_karte_model_e <- leaflet() %>%
                    options = layersControlOptions(collapsed = FALSE))
 # anschauen
 interaktive_karte_model_e
+
+saveWidget(interaktive_karte_model_e, file = "interaktive_karten/interaktive_karte_model_e.html", selfcontained = TRUE)
+ browseURL("interaktive_karten/interaktive_karte_model_e.html")
