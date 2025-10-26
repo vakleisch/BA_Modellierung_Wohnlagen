@@ -163,7 +163,7 @@ probs_ausserhalb_ohne_preis_bahn <- predict(model_gam_ausserhalb_ohne_preis_bahn
                                          newdata = fehler_model_gam_ausserhalb_ohne_preis_bahn, type = "response")
 
 
-
+# Wie viele Wert werden mit großer confidence falsch zugeordnet?
 anteil_ueber_grenze <- function(df, grenze = 0.7) {
   # Für jede Zeile prüfen, ob ein Wert größer als die Grenze ist
   any_gt <- apply(df, 1, function(x) any(x > grenze))
