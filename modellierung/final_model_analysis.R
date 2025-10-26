@@ -120,6 +120,68 @@ evaluate_confusion_matrix_equal_priors(model_gam_zentral_ohne_preis_bahn,
                           y_col = "Wohnlage_numerisch")
 
 
+# Modelle auf falsche Pukte anwenden
+fehler_model_gam_zentral <- missclassification_data_zentral(model_gam_zentral, 
+                                                            data = model_data_zentral_complete,
+                                                            predict_fun = predict_labels_discr)
+fehler_model_gam_ausserhalb <- missclassification_data_ausserhalb(model_gam_ausserhalb, 
+                                                                  data = model_data_ausserhalb_complete,
+                                                                  predict_fun = predict_labels_discr)
+fehler_model_gam_zentral_ohne_preis <- missclassification_data_zentral(model_gam_zentral_ohne_preis, 
+                                                                       data = model_data_zentral_complete,
+                                                                       predict_fun = predict_labels_discr)
+fehler_model_gam_ausserhalb_ohne_preis <- missclassification_data_ausserhalb(model_gam_ausserhalb_ohne_preis, 
+                                                                             data = model_data_ausserhalb_complete,
+                                                                             predict_fun = predict_labels_discr)
+fehler_model_gam_zentral_ohne <- missclassification_data_zentral(model_gam_zentral_ohne, 
+                                                                 data = model_data_zentral_complete,
+                                                                 predict_fun = predict_labels_discr)
+fehler_model_gam_ausserhalb_ohne <- missclassification_data_ausserhalb(model_gam_ausserhalb_ohne, 
+                                                                       data = model_data_ausserhalb_complete,
+                                                                       predict_fun = predict_labels_discr)
+fehler_model_gam_zentral_ohne_preis_bahn <- missclassification_data_zentral(model_gam_zentral_ohne_preis_bahn, 
+                                                                            data = model_data_zentral_complete,
+                                                                            predict_fun = predict_labels_discr)
+fehler_model_gam_ausserhalb_ohne_preis_bahn <- missclassification_data_ausserhalb(model_gam_ausserhalb_ohne_preis_bahn, 
+                                                                                  data = model_data_ausserhalb_complete,
+                                                                                  predict_fun = predict_labels_discr)
+probs_zentral <- predict(model_gam_zentral,
+                 newdata = fehler_model_gam_zentral, type = "response")
+probs_ausserhalb <- predict(model_gam_ausserhalb,
+                     newdata = fehler_model_gam_ausserhalb, type = "response")
+probs_zentral_ohne <- predict(model_gam_zentral_ohne,
+                 newdata = fehler_model_gam_zentral_ohne, type = "response")
+probs_ausserhalb_ohne <- predict(model_gam_ausserhalb_ohne,
+                     newdata = fehler_model_gam_ausserhalb_ohne, type = "response")
+probs_zentral_ohne_preis <- predict(model_gam_zentral_ohne_preis,
+                          newdata = fehler_model_gam_zentral_ohne_preis, type = "response")
+probs_ausserhalb_ohne_preis <- predict(model_gam_ausserhalb_ohne_preis,
+                              newdata = fehler_model_gam_ausserhalb_ohne_preis, type = "response")
+probs_zentral_ohne_preis_bahn <- predict(model_gam_zentral_ohne_preis_bahn,
+                                   newdata = fehler_model_gam_zentral_ohne_preis_bahn, type = "response")
+probs_ausserhalb_ohne_preis_bahn <- predict(model_gam_ausserhalb_ohne_preis_bahn,
+                                         newdata = fehler_model_gam_ausserhalb_ohne_preis_bahn, type = "response")
+
+
+
+anteil_ueber_grenze <- function(df, grenze = 0.7) {
+  # Für jede Zeile prüfen, ob ein Wert größer als die Grenze ist
+  any_gt <- apply(df, 1, function(x) any(x > grenze))
+  
+  # Anteil berechnen
+  anteil <- mean(any_gt)
+  
+  # Ergebnis zurückgeben
+  return(anteil)
+}
+anteil_ueber_grenze(probs_zentral, grenze = 0.7)
+anteil_ueber_grenze(probs_ausserhalb, grenze = 0.7)
+anteil_ueber_grenze(probs_zentral_ohne, grenze = 0.7)
+anteil_ueber_grenze(probs_ausserhalb_ohne, grenze = 0.7)
+anteil_ueber_grenze(probs_zentral_ohne_preis, grenze = 0.7)
+anteil_ueber_grenze(probs_ausserhalb_ohne_preis, grenze = 0.7)
+anteil_ueber_grenze(probs_zentral_ohne_preis_bahn, grenze = 0.7)
+anteil_ueber_grenze(probs_ausserhalb_ohne_preis_bahn, grenze = 0.7)
 
 
 
