@@ -24,6 +24,10 @@ model_gam_zentral <- readRDS("modelle/gam_model_zentral.rds")
 model_gam_ausserhalb <- readRDS("modelle/gam_model_ausserhalb.rds")
 model_gam_zentral_ohne_preis <- readRDS("modelle/gam_model_zentral_ohne_preis.rds")
 model_gam_ausserhalb_ohne_preis <- readRDS("modelle/gam_model_ausserhalb_ohne_preis.rds")
+model_gam_zentral_ohne <- readRDS("modelle/gam_model_zentral_ohne.rds")
+model_gam_ausserhalb_ohne <- readRDS("modelle/gam_model_ausserhalb_ohne.rds")
+model_gam_ausserhalb_ohne_preis_bahn <- readRDS("modelle/gam_model_ausserhalb_ohne_preis_bahn.rds")
+model_gam_zentral_ohne_preis_bahn <- readRDS("modelle/gam_model_zentral_ohne_preis_bahn.rds")
 
 # Daten laden
 load("daten/model_data_zentral_complete.RData")
@@ -63,6 +67,61 @@ evaluate_confusion_matrix_equal_priors(model_gam_ausserhalb,
 evaluate_confusion_matrix_equal_priors(model_gam_zentral_ohne, 
                                        test_data = model_data_zentral_complete,
                                        y_col = "Wohnlage_numerisch")
+
+# Modellgüte der neuen Modelle
+# ohne huaspreisindex
+evaluate_confusion_matrix(model_gam_ausserhalb_ohne_preis, 
+                          test_data = model_data_ausserhalb_complete,
+                          y_col = "Wohnlage_numerisch")
+evaluate_confusion_matrix(model_gam_zentral_ohne_preis, 
+                          test_data = model_data_zentral_complete,
+                          y_col = "Wohnlage_numerisch")
+
+# ohne bahnhof
+evaluate_confusion_matrix(model_gam_ausserhalb_ohne, 
+                          test_data = model_data_ausserhalb_complete,
+                          y_col = "Wohnlage_numerisch")
+evaluate_confusion_matrix(model_gam_zentral_ohne, 
+                          test_data = model_data_zentral_complete,
+                          y_col = "Wohnlage_numerisch")
+
+# ohne hauspreis und bahnhof
+evaluate_confusion_matrix(model_gam_ausserhalb_ohne_preis_bahn, 
+                          test_data = model_data_ausserhalb_complete,
+                          y_col = "Wohnlage_numerisch")
+evaluate_confusion_matrix(model_gam_zentral_ohne_preis_bahn, 
+                          test_data = model_data_zentral_complete,
+                          y_col = "Wohnlage_numerisch")
+
+
+# neue modelle mit prior anpassung
+# ohne huaspreisindex
+evaluate_confusion_matrix_equal_priors(model_gam_ausserhalb_ohne_preis, 
+                          test_data = model_data_ausserhalb_complete,
+                          y_col = "Wohnlage_numerisch")
+evaluate_confusion_matrix_equal_priors(model_gam_zentral_ohne_preis, 
+                          test_data = model_data_zentral_complete,
+                          y_col = "Wohnlage_numerisch")
+
+# ohne bahnhof
+evaluate_confusion_matrix_equal_priors(model_gam_ausserhalb_ohne, 
+                          test_data = model_data_ausserhalb_complete,
+                          y_col = "Wohnlage_numerisch")
+evaluate_confusion_matrix_equal_priors(model_gam_zentral_ohne, 
+                          test_data = model_data_zentral_complete,
+                          y_col = "Wohnlage_numerisch")
+
+# ohne hauspreis und bahnhof
+evaluate_confusion_matrix_equal_priors(model_gam_ausserhalb_ohne_preis_bahn, 
+                          test_data = model_data_ausserhalb_complete,
+                          y_col = "Wohnlage_numerisch")
+evaluate_confusion_matrix_equal_priors(model_gam_zentral_ohne_preis_bahn, 
+                          test_data = model_data_zentral_complete,
+                          y_col = "Wohnlage_numerisch")
+
+
+
+
 
 # Log Likelihood der Modelle vergeleichen: näher an 0 ist besser
 # Freiheitsgrade: Komplexität des Modells
