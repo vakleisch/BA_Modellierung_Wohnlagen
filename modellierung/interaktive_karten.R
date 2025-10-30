@@ -821,6 +821,15 @@ browseURL("interaktive_karten/interaktive_karte_model_e.html")
 
 
 # Ohne Huaspreisindex
+
+# test------------
+fehler_model_gam_kombiniert_ohne_preis_wgs <- fehler_model_gam_kombiniert_ohne_preis_wgs %>%
+  mutate(
+    lon = st_coordinates(geometry)[,1],
+    lat = st_coordinates(geometry)[,2]
+  )
+
+
 # Interaktive Karte mit den Korrekten und Falschen
 interaktive_karte_model_reduziert <- leaflet() %>%
   setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
@@ -850,7 +859,9 @@ interaktive_karte_model_reduziert <- leaflet() %>%
       "<b>Hauspreisindex:</b> ", hauspreis_index, "<br>", 
       "<b>Nahversorgungsindex:</b> ", nahversorgungs_index, "<br>",
       "<b> ÖPNV-Index:</b> ", opnv_index, "<br>",
-      "<b>Straßentyp:</b> ", straßentyp_gruppe, "<br>"
+      "<b>Straßentyp:</b> ", straßentyp_gruppe, "<br>",
+      "<b>Koordinaten:</b> ", round(st_coordinates(geometry)[,1], 5), ", ",
+      round(st_coordinates(geometry)[,2], 5), "<br>"
     ),
     group = "Fehler"
   ) %>%
@@ -872,7 +883,9 @@ interaktive_karte_model_reduziert <- leaflet() %>%
       "<b>Distanz Mittelzentrum:</b> ", distanz_mittelzentrum, "<br>",
       "<b>Nahversorgungsindex:</b> ", nahversorgungs_index, "<br>",
       "<b> ÖPNV-Index:</b> ", opnv_index, "<br>",
-      "<b>Straßentyp:</b> ", straßentyp_gruppe, "<br>"
+      "<b>Straßentyp:</b> ", straßentyp_gruppe, "<br>",
+      "<b>Koordinaten:</b> ", round(st_coordinates(geometry)[,1], 5), ", ",
+      round(st_coordinates(geometry)[,2], 5), "<br>"
     ),
     group = "Korrekt"
   ) %>%

@@ -269,7 +269,9 @@ data_final_short_ausserhalb <- data_final_short %>%
   filter(Wohnlage %in% c("durchschnittliche Lage (außerhalb)", 
                          "gute Lage (außerhalb)", 
                          "beste Lage (außerhalb)"))
-
+# data final short saven
+save(data_final_short, file = here("daten", "data_final.RData"))
+names(data_final_short)
 
 # model_data: finaler Datensatz für die Modellierung erstellen
 

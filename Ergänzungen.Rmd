@@ -1,0 +1,341 @@
+---
+title: "Ergänzungen"
+author: "Vanessa Kleisch"
+date: "2025-10-30"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(here)
+source(here("modellierung", "model_evaluation.R"))
+source(here("modellierung", "plot_funktionen.R"))
+library(yardstick)
+library(dplyr)
+library(caret)
+library(gratia)
+library(ggplot2)
+library(corrplot)
+library(car)
+library(mgcv)
+library(reshape2)
+library(mgcViz)
+library(confintr)
+library(rcompanion)
+library(rgl)
+library(sf)
+options(scipen = 999) # Verhindert wissenschaftliche Notation in ggplot2
+
+
+
+# Modelle laden
+model_gam_zentral <- readRDS("modelle/gam_model_zentral.rds") 
+model_gam_ausserhalb <- readRDS("modelle/gam_model_ausserhalb.rds")
+model_gam_zentral_ohne_preis <- readRDS("modelle/gam_model_zentral_ohne_preis.rds")
+model_gam_ausserhalb_ohne_preis <- readRDS("modelle/gam_model_ausserhalb_ohne_preis.rds")
+model_gam_zentral_ohne <- readRDS("modelle/gam_model_zentral_ohne.rds")
+model_gam_ausserhalb_ohne <- readRDS("modelle/gam_model_ausserhalb_ohne.rds")
+model_gam_ausserhalb_ohne_preis_bahn <- readRDS("modelle/gam_model_ausserhalb_ohne_preis_bahn.rds")
+model_gam_zentral_ohne_preis_bahn <- readRDS("modelle/gam_model_zentral_ohne_preis_bahn.rds")
+
+# Daten laden
+load("daten/model_data_zentral_complete.RData")
+load("daten/model_data_ausserhalb_complete.RData")
+load("daten/model_data_complete.RData")
+
+fehler_model_gam_zentral <- missclassification_data_zentral(model_gam_zentral, 
+                                                            data = model_data_zentral_complete,
+                                                            predict_fun = predict_labels_discr)
+fehler_model_gam_ausserhalb <- missclassification_data_ausserhalb(model_gam_ausserhalb, 
+                                                                  data = model_data_ausserhalb_complete,
+                                                                  predict_fun = predict_labels_discr)
+fehler_model_gam_zentral_ohne_preis <- missclassification_data_zentral(model_gam_zentral_ohne_preis, 
+                                                                       data = model_data_zentral_complete,
+                                                                       predict_fun = predict_labels_discr)
+fehler_model_gam_ausserhalb_ohne_preis <- missclassification_data_ausserhalb(model_gam_ausserhalb_ohne_preis, 
+                                                                             data = model_data_ausserhalb_complete,
+                                                                             predict_fun = predict_labels_discr)
+fehler_model_gam_zentral_ohne <- missclassification_data_zentral(model_gam_zentral_ohne, 
+                                                                 data = model_data_zentral_complete,
+                                                                 predict_fun = predict_labels_discr)
+fehler_model_gam_ausserhalb_ohne <- missclassification_data_ausserhalb(model_gam_ausserhalb_ohne, 
+                                                                       data = model_data_ausserhalb_complete,
+                                                                       predict_fun = predict_labels_discr)
+fehler_model_gam_zentral_ohne_preis_bahn <- missclassification_data_zentral(model_gam_zentral_ohne_preis_bahn, 
+                                                                            data = model_data_zentral_complete,
+                                                                            predict_fun = predict_labels_discr)
+fehler_model_gam_ausserhalb_ohne_preis_bahn <- missclassification_data_ausserhalb(model_gam_ausserhalb_ohne_preis_bahn, 
+                                                                                  data = model_data_ausserhalb_complete,
+                                                                                  predict_fun = predict_labels_discr)
+probs_zentral <- predict(model_gam_zentral,
+                 newdata = fehler_model_gam_zentral, type = "response")
+probs_ausserhalb <- predict(model_gam_ausserhalb,
+                     newdata = fehler_model_gam_ausserhalb, type = "response")
+probs_zentral_ohne <- predict(model_gam_zentral_ohne,
+                 newdata = fehler_model_gam_zentral_ohne, type = "response")
+probs_ausserhalb_ohne <- predict(model_gam_ausserhalb_ohne,
+                     newdata = fehler_model_gam_ausserhalb_ohne, type = "response")
+probs_zentral_ohne_preis <- predict(model_gam_zentral_ohne_preis,
+                          newdata = fehler_model_gam_zentral_ohne_preis, type = "response")
+probs_ausserhalb_ohne_preis <- predict(model_gam_ausserhalb_ohne_preis,
+                              newdata = fehler_model_gam_ausserhalb_ohne_preis, type = "response")
+probs_zentral_ohne_preis_bahn <- predict(model_gam_zentral_ohne_preis_bahn,
+                                   newdata = fehler_model_gam_zentral_ohne_preis_bahn, type = "response")
+probs_ausserhalb_ohne_preis_bahn <- predict(model_gam_ausserhalb_ohne_preis_bahn,
+                                         newdata = fehler_model_gam_ausserhalb_ohne_preis_bahn, type = "response")
+
+# Boxplots der wahrscheinlichkeiten
+colnames(probs_zentral) <- c("Durchschnittlich", "Gut", "Beste")
+colnames(probs_ausserhalb) <- c("Durchschnittlich", "Gut", "Beste")
+colnames(probs_zentral_ohne) <- c("Durchschnittlich", "Gut", "Beste")
+colnames(probs_ausserhalb_ohne) <- c("Durchschnittlich", "Gut", "Beste")
+colnames(probs_zentral_ohne_preis) <- c("Durchschnittlich", "Gut", "Beste")
+colnames(probs_ausserhalb_ohne_preis) <- c("Durchschnittlich", "Gut", "Beste")
+colnames(probs_zentral_ohne_preis_bahn) <- c("Durchschnittlich", "Gut", "Beste")
+colnames(probs_ausserhalb_ohne_preis_bahn) <- c("Durchschnittlich", "Gut", "Beste")
+
+```
+
+
+## Ohne Gleichverteilungspriori
+
+### Vollständiges Modell
+
+```{r, echo = FALSE, warnings = FALSE}
+# In data.frame umwandeln und ins long-Format bringen
+df <- as.data.frame(probs_zentral)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (zentral)",
+    x = "Zentrale Wohnlagekategorie",
+    y = "Klassenwahrscheinlichkeit"
+  )
+
+df <- as.data.frame(probs_ausserhalb)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black", alpha = 0.1) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (außerhalb)",
+    x = "Wohnlagekategorie außerhalb",
+    y = "Klassenwahrscheinlichkeit"
+  )
+
+```
+
+
+### Modell ohne distanz_bahnhof
+
+```{r, echo = FALSE, warnings = FALSE}
+# Boxplots der wahrscheinlichkeiten ohne bahnhof
+df <- as.data.frame(probs_zentral_ohne)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (zentral)",
+    x = "Zentrale Wohnlagekategorie",
+    y = "Klassenwahrscheinlichkeit"
+  )
+
+df <- as.data.frame(probs_ausserhalb_ohne)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black", alpha = 0.1) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (außerhalb)",
+    x = "Wohnlagekategorie außerhalb",
+    y = "Klassenwahrscheinlichkeit"
+  )
+```
+
+### Modell ohne Hauspreisindex
+
+```{r, echo = FALSE, warnings = FALSE}
+df <- as.data.frame(probs_zentral_ohne_preis)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (zentral)",
+    x = "Zentrale Wohnlagekategorie",
+    y = "Klassenwahrscheinlichkeit"
+  )
+
+df <- as.data.frame(probs_ausserhalb_ohne_preis)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black", alpha = 0.1) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (außerhalb)",
+    x = "Wohnlagekategorie außerhalb",
+    y = "Klassenwahrscheinlichkeit"
+  )
+```
+
+
+## Mit Gleichverteilungspriori
+
+```{r, include=FALSE}
+# jetzt mit angepasster priori
+predict1 <- function(model,
+                                        newdata,
+                                        number_categories = 3,
+                                        y_col = "Wohnlage_numerisch") {
+  # Matrix mit P(y = k | x) vom Modell
+  probs <- predict(model, newdata = newdata, type = "response")
+  
+  # Levels sichern
+  all_levels <- as.character(0:(number_categories - 1))
+  colnames(probs) <- all_levels
+  
+  # Modellklassenverteilung (durchschnittliche Wahrscheinlichkeit je Klasse)
+  prior_model <- colMeans(probs)
+  
+  # Gleichverteilung als neue Prior (z.B. 1/3 für jede Klasse bei 3 Klassen)
+  prior_uniform <- rep(1 / number_categories, number_categories)
+  
+  # Wahrscheinlichkeiten anpassen: adjusted = probs / prior_model * prior_uniform
+  adjusted <- sweep(probs, 2, prior_model, "/")
+  adjusted <- sweep(adjusted, 2, prior_uniform, "*")
+  adjusted_probs <- adjusted / rowSums(adjusted)
+  
+  # Noch einmal sicherstellen, dass colnames stimmen
+  colnames(adjusted_probs) <- c("Durchschnittlich", "Gut", "Beste")
+  return(adjusted_probs)
+}
+
+probs_zentral <- predict1(model_gam_zentral,
+                         newdata = fehler_model_gam_zentral)
+probs_ausserhalb <- predict1(model_gam_ausserhalb,
+                            newdata = fehler_model_gam_ausserhalb)
+probs_zentral_ohne <- predict1(model_gam_zentral_ohne,
+                              newdata = fehler_model_gam_zentral_ohne)
+probs_ausserhalb_ohne <- predict1(model_gam_ausserhalb_ohne,
+                                 newdata = fehler_model_gam_ausserhalb_ohne)
+probs_zentral_ohne_preis <- predict1(model_gam_zentral_ohne_preis,
+                                    newdata = fehler_model_gam_zentral_ohne_preis)
+probs_ausserhalb_ohne_preis <- predict1(model_gam_ausserhalb_ohne_preis,
+                                       newdata = fehler_model_gam_ausserhalb_ohne_preis)
+probs_zentral_ohne_preis_bahn <- predict1(model_gam_zentral_ohne_preis_bahn,
+                                         newdata = fehler_model_gam_zentral_ohne_preis_bahn)
+probs_ausserhalb_ohne_preis_bahn <- predict1(model_gam_ausserhalb_ohne_preis_bahn,
+                                            newdata = fehler_model_gam_ausserhalb_ohne_preis_bahn)
+
+```
+
+
+### Vollständiges Modell
+
+```{r, echo = FALSE, warnings = FALSE}
+# In data.frame umwandeln und ins long-Format bringen
+df <- as.data.frame(probs_zentral)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (zentral)",
+    x = "Zentrale Wohnlagekategorie",
+    y = "Klassenwahrscheinlichkeit"
+  )
+
+df <- as.data.frame(probs_ausserhalb)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black", alpha = 0.1) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (außerhalb)",
+    x = "Wohnlagekategorie außerhalb",
+    y = "Klassenwahrscheinlichkeit"
+  )
+
+```
+
+
+### Modell ohne distanz_bahnhof
+
+```{r, echo = FALSE, warnings = FALSE}
+# Boxplots der wahrscheinlichkeiten ohne bahnhof
+df <- as.data.frame(probs_zentral_ohne)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (zentral)",
+    x = "Zentrale Wohnlagekategorie",
+    y = "Klassenwahrscheinlichkeit"
+  )
+
+df <- as.data.frame(probs_ausserhalb_ohne)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black", alpha = 0.1) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (außerhalb)",
+    x = "Wohnlagekategorie außerhalb",
+    y = "Klassenwahrscheinlichkeit"
+  )
+```
+
+### Modell ohne Hauspreisindex
+
+```{r, echo = FALSE, warnings = FALSE}
+df <- as.data.frame(probs_zentral_ohne_preis)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (zentral)",
+    x = "Zentrale Wohnlagekategorie",
+    y = "Klassenwahrscheinlichkeit"
+  )
+
+df <- as.data.frame(probs_ausserhalb_ohne_preis)
+df_long <- melt(df, variable.name = "Spalte", value.name = "Wert")
+
+# Boxplot pro Spalte
+ggplot(df_long, aes(x = Spalte, y = Wert)) +
+  geom_boxplot(color = "black", alpha = 0.1) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Boxplot der Klassenwahrscheinlichkeiten (außerhalb)",
+    x = "Wohnlagekategorie außerhalb",
+    y = "Klassenwahrscheinlichkeit"
+  )
+```

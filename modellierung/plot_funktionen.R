@@ -91,7 +91,6 @@ visualize_part_effects <- function(model, file_name_prefix, subfolder_name) {
       labs(
         title = NULL,
         x = x_label,
-        y = "Partieller Effekt"
       ) +
       geom_hline(yintercept = 0, color = "red", linetype = 2)
     
