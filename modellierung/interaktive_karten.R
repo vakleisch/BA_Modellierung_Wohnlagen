@@ -1132,7 +1132,8 @@ interaktive_karte_nahversorgung <- leaflet(model_data_complete_wgs) %>%
     stroke = TRUE,
     weight = 1,
     radius = 4,
-    label = ~paste("Nahversorgungsindex:", round(nahversorgungs_index, 2))
+    label = ~paste("Nahversorgungsindex:", round(nahversorgungs_index, 2)),
+    group = "Punkte"
   ) %>%
   addLegend(
     "bottomright",
@@ -1140,7 +1141,10 @@ interaktive_karte_nahversorgung <- leaflet(model_data_complete_wgs) %>%
     values = ~nahversorgungs_index,
     title = "Nahversorgungsindex",
     opacity = 1
-  )
+  ) %>%
+  addLayersControl(overlayGroups = c("Punkte"),
+                      options = layersControlOptions(collapsed = FALSE))
+
 
 # Speichern als html
  saveWidget(interaktive_karte_nahversorgung,
@@ -1168,7 +1172,8 @@ selfcontained = TRUE)
      stroke = TRUE,
      weight = 1,
      radius = 4,
-     label = ~paste("Distanz zum Mittelzentrum:", round(distanz_mittelzentrum, 2))
+     label = ~paste("Distanz zum Mittelzentrum:", round(distanz_mittelzentrum, 2)),
+     group = "Punkte"
    ) %>%
    addLegend(
      "bottomright",
@@ -1176,7 +1181,10 @@ selfcontained = TRUE)
      values = ~distanz_mittelzentrum,
      title = "Distanz zum Mittelzentrum (in m)",
      opacity = 1
-   )
+   )%>%
+   addLayersControl(overlayGroups = c("Punkte"),
+                    options = layersControlOptions(collapsed = FALSE))
+ 
  
  # Speichern als html
  saveWidget(interaktive_karte_distanz_mittelzentrum,
@@ -1204,7 +1212,8 @@ selfcontained = TRUE)
      stroke = TRUE,
      weight = 1,
      radius = 4,
-     label = ~paste("Distanz zum Bahnhof:", round(distanz_bahnhof, 2))
+     label = ~paste("Distanz zum Bahnhof:", round(distanz_bahnhof, 2)),
+     group = "Punkte"
    ) %>%
    addLegend(
      "bottomright",
@@ -1212,7 +1221,10 @@ selfcontained = TRUE)
      values = ~distanz_bahnhof,
      title = "Distanz zum Bahnhof (in m)",
      opacity = 1
-   )
+   )%>%
+   addLayersControl(overlayGroups = c("Punkte"),
+                    options = layersControlOptions(collapsed = FALSE))
+ 
  
  # Speichern als html
  saveWidget(interaktive_karte_distanz_bahnhof,
@@ -1239,7 +1251,8 @@ selfcontained = TRUE)
      stroke = TRUE,
      weight = 1,
      radius = 4,
-     label = ~paste("Distanz zum Unterzentrum:", round(distanz_unterzentrum, 2))
+     label = ~paste("Distanz zum Unterzentrum:", round(distanz_unterzentrum, 2)),
+     group = "Punkte"
    ) %>%
    addLegend(
      "bottomright",
@@ -1247,7 +1260,10 @@ selfcontained = TRUE)
      values = ~distanz_unterzentrum,
      title = "Distanz zum Unterzentrum (in m)",
      opacity = 1
-   )
+   )%>%
+   addLayersControl(overlayGroups = c("Punkte"),
+                    options = layersControlOptions(collapsed = FALSE))
+ 
  
  # Speichern als html
  saveWidget(interaktive_karte_distanz_unterzentrum,
@@ -1256,5 +1272,121 @@ selfcontained = TRUE)
  browseURL("interaktive_karten/variablen/interaktive_karte_distanz_unterzentrum.html")
  
  
+ # Karte: distanz_bushaltestelle
  
+ pal <- colorNumeric(
+   palette = "Spectral",  # alternativ: "viridis", "plasma", "inferno", "magma", "Spectral"
+   domain = model_data_complete_wgs$distanz_bushaltestelle
+ )
+ 
+ 
+ interaktive_karte_distanz_bushaltestelle <- leaflet(model_data_complete_wgs) %>%
+   addProviderTiles("CartoDB.Positron") %>%
+   setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
+   addPolylines(data = wohnlage_grenzen_wgs, color = "black", weight = 0.5)%>% 
+   addCircleMarkers(
+     fillColor = ~pal(distanz_bushaltestelle),
+     fillOpacity = 1,
+     color = "black",
+     stroke = TRUE,
+     weight = 1,
+     radius = 4,
+     label = ~paste("Distanz zur Bushaltestelle:", round(distanz_bushaltestelle, 2)),
+     group = "Punkte"
+   ) %>%
+   addLegend(
+     "bottomright",
+     pal = pal,
+     values = ~distanz_bushaltestelle,
+     title = "Distanz zur Bushaltestelle (in m)",
+     opacity = 1
+   )%>%
+   addLayersControl(overlayGroups = c("Punkte"),
+                    options = layersControlOptions(collapsed = FALSE))
+ 
+ 
+ # Speichern als html
+ saveWidget(interaktive_karte_distanz_bushaltestelle,
+            file = "interaktive_karten/variablen/interaktive_karte_distanz_bushaltestelle.html",
+            selfcontained = TRUE)
+ browseURL("interaktive_karten/variablen/interaktive_karte_distanz_bushaltestelle.html")
+ 
+ 
+ # Karte: distanz_ubahn
+ 
+ pal <- colorNumeric(
+   palette = "Spectral",  # alternativ: "viridis", "plasma", "inferno", "magma", "Spectral"
+   domain = model_data_complete_wgs$distanz_ubahn
+ )
+ 
+ 
+ interaktive_karte_distanz_ubahn <- leaflet(model_data_complete_wgs) %>%
+   addProviderTiles("CartoDB.Positron") %>%
+   setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
+   addPolylines(data = wohnlage_grenzen_wgs, color = "black", weight = 0.5)%>% 
+   addCircleMarkers(
+     fillColor = ~pal(distanz_ubahn),
+     fillOpacity = 1,
+     color = "black",
+     stroke = TRUE,
+     weight = 1,
+     radius = 4,
+     label = ~paste("Distanz zur U-Bahn:", round(distanz_ubahn, 2)),
+     group = "Punkte"
+   ) %>%
+   addLegend(
+     "bottomright",
+     pal = pal,
+     values = ~distanz_ubahn,
+     title = "Distanz zur U-Bahn (in m)",
+     opacity = 1
+   )%>%
+   addLayersControl(overlayGroups = c("Punkte"),
+                    options = layersControlOptions(collapsed = FALSE))
+ 
+ 
+ # Speichern als html
+ saveWidget(interaktive_karte_distanz_ubahn,
+            file = "interaktive_karten/variablen/interaktive_karte_distanz_ubahn.html",
+            selfcontained = TRUE)
+ browseURL("interaktive_karten/variablen/interaktive_karte_distanz_ubahn.html")
+ 
+ # Karte: OPNV-Index
+ 
+ pal <- colorNumeric(
+   palette = "magma",  # alternativ: "viridis", "plasma", "inferno", "magma", "Spectral"
+   domain = model_data_complete_wgs$opnv_index
+ )
+ 
+ 
+ interaktive_karte_opnv_index <- leaflet(model_data_complete_wgs) %>%
+   addProviderTiles("CartoDB.Positron") %>%
+   setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
+   addPolylines(data = wohnlage_grenzen_wgs, color = "black", weight = 0.5)%>% 
+   addCircleMarkers(
+     fillColor = ~pal(opnv_index),
+     fillOpacity = 1,
+     color = "black",
+     stroke = TRUE,
+     weight = 1,
+     radius = 4,
+     label = ~paste("OPNV-Index:", round(opnv_index, 2)),
+     group = "Punkte"
+   ) %>%
+   addLegend(
+     "bottomright",
+     pal = pal,
+     values = ~opnv_index,
+     title = "OPNV-Index",
+     opacity = 1
+   ) %>%
+   addLayersControl(overlayGroups = c("Punkte"),
+                    options = layersControlOptions(collapsed = FALSE))
+ 
+ 
+ # Speichern als html
+ saveWidget(interaktive_karte_opnv_index,
+            file = "interaktive_karten/variablen/interaktive_karte_opnv_index.html",
+            selfcontained = TRUE)
+ browseURL("interaktive_karten/variablen/interaktive_karte_opnv_index.html")
  
