@@ -1054,3 +1054,207 @@ saveWidget(interaktive_karte_model_ohne,
            file = "interaktive_karten/interaktive_karte_model_ohne.html",
            selfcontained = TRUE)
 browseURL("interaktive_karten/interaktive_karte_model_ohne.html")
+
+
+
+# Karte mit Variablen
+
+# Karte mit Variablen (TEST)
+
+
+pal <- colorNumeric(
+  palette = "magma",  # alternativ: "viridis", "plasma", "inferno", "magma", "Spectral"
+  domain = model_data_complete_wgs$nahversorgungs_index
+)
+
+
+interaktive_karte_nahversorgung <- leaflet(model_data_complete_wgs) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
+  addPolygons(data = wohnlagen_muc_wgs,
+              fillColor = ~wohnlagen_muc_wgs$color,
+              fillOpacity = 0.6,
+              color = "black",
+              weight = 0.5,
+              group = "Wahre Wohnlage") %>%
+  addPolylines(data = wohnlage_grenzen_wgs, color = "black", weight = 0.5)%>% 
+  addLegend(
+    position = "bottomright",
+    colors = wohnlage_farben,
+    labels = names(wohnlage_farben),
+    title = "Wohnlage",
+    opacity = 1,
+    group = "Wahre Wohnlage"
+  ) %>%
+  addCircleMarkers(
+    fillColor = ~pal(nahversorgungs_index),
+    fillOpacity = 1,
+    color = "black",
+    stroke = TRUE,
+    weight = 1,
+    radius = 4,
+    label = ~paste("Nahversorgungsindex:", round(nahversorgungs_index, 2))
+  ) %>%
+  addLegend(
+    "bottomright",
+    pal = pal,
+    values = ~nahversorgungs_index,
+    title = "Nahversorgungsindex",
+    opacity = 1
+  )%>%
+  addLayersControl(overlayGroups = c("Wahre Wohnlage"),
+                   options = layersControlOptions(collapsed = FALSE))
+
+interaktive_karte_nahversorgung
+
+
+
+# Speichern als html
+# saveWidget(interaktive_karte_complete, file = "interaktive_karten/interaktive_karte_complete.html", selfcontained = TRUE)
+# browseURL("interaktive_karten/interaktive_karte_complete.html")
+
+# Karte: Nahversorgung
+
+pal <- colorNumeric(
+  palette = "magma",  # alternativ: "viridis", "plasma", "inferno", "magma", "Spectral"
+  domain = model_data_complete_wgs$nahversorgungs_index
+)
+
+
+interaktive_karte_nahversorgung <- leaflet(model_data_complete_wgs) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
+  addPolylines(data = wohnlage_grenzen_wgs, color = "black", weight = 0.5)%>% 
+  addCircleMarkers(
+    fillColor = ~pal(nahversorgungs_index),
+    fillOpacity = 1,
+    color = "black",
+    stroke = TRUE,
+    weight = 1,
+    radius = 4,
+    label = ~paste("Nahversorgungsindex:", round(nahversorgungs_index, 2))
+  ) %>%
+  addLegend(
+    "bottomright",
+    pal = pal,
+    values = ~nahversorgungs_index,
+    title = "Nahversorgungsindex",
+    opacity = 1
+  )
+
+# Speichern als html
+ saveWidget(interaktive_karte_nahversorgung,
+file = "interaktive_karten/variablen/interaktive_karte_nahversorgung.html",
+selfcontained = TRUE)
+ browseURL("interaktive_karten/variablen/interaktive_karte_nahversorgung.html")
+
+
+ # Karte: distanz_mittelzentrum
+ 
+ pal <- colorNumeric(
+   palette = "Spectral",  # alternativ: "viridis", "plasma", "inferno", "magma", "Spectral"
+   domain = model_data_complete_wgs$distanz_mittelzentrum
+ )
+ 
+ 
+ interaktive_karte_distanz_mittelzentrum <- leaflet(model_data_complete_wgs) %>%
+   addProviderTiles("CartoDB.Positron") %>%
+   setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
+   addPolylines(data = wohnlage_grenzen_wgs, color = "black", weight = 0.5)%>% 
+   addCircleMarkers(
+     fillColor = ~pal(distanz_mittelzentrum),
+     fillOpacity = 1,
+     color = "black",
+     stroke = TRUE,
+     weight = 1,
+     radius = 4,
+     label = ~paste("Distanz zum Mittelzentrum:", round(distanz_mittelzentrum, 2))
+   ) %>%
+   addLegend(
+     "bottomright",
+     pal = pal,
+     values = ~distanz_mittelzentrum,
+     title = "Distanz zum Mittelzentrum (in m)",
+     opacity = 1
+   )
+ 
+ # Speichern als html
+ saveWidget(interaktive_karte_distanz_mittelzentrum,
+            file = "interaktive_karten/variablen/interaktive_karte_distanz_mittelzentrum.html",
+            selfcontained = TRUE)
+ browseURL("interaktive_karten/variablen/interaktive_karte_distanz_mittelzentrum.html")
+ 
+ 
+ # Karte: distanz_bahnhof
+ 
+ pal <- colorNumeric(
+   palette = "Spectral",  # alternativ: "viridis", "plasma", "inferno", "magma", "Spectral"
+   domain = model_data_complete_wgs$distanz_bahnhof
+ )
+ 
+ 
+ interaktive_karte_distanz_bahnhof <- leaflet(model_data_complete_wgs) %>%
+   addProviderTiles("CartoDB.Positron") %>%
+   setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
+   addPolylines(data = wohnlage_grenzen_wgs, color = "black", weight = 0.5)%>% 
+   addCircleMarkers(
+     fillColor = ~pal(distanz_bahnhof),
+     fillOpacity = 1,
+     color = "black",
+     stroke = TRUE,
+     weight = 1,
+     radius = 4,
+     label = ~paste("Distanz zum Bahnhof:", round(distanz_bahnhof, 2))
+   ) %>%
+   addLegend(
+     "bottomright",
+     pal = pal,
+     values = ~distanz_bahnhof,
+     title = "Distanz zum Bahnhof (in m)",
+     opacity = 1
+   )
+ 
+ # Speichern als html
+ saveWidget(interaktive_karte_distanz_bahnhof,
+            file = "interaktive_karten/variablen/interaktive_karte_distanz_bahnhof.html",
+            selfcontained = TRUE)
+ browseURL("interaktive_karten/variablen/interaktive_karte_distanz_bahnhof.html")
+ 
+ # Karte: distanz_unterzentrum
+ 
+ pal <- colorNumeric(
+   palette = "Spectral",  # alternativ: "viridis", "plasma", "inferno", "magma", "Spectral"
+   domain = model_data_complete_wgs$distanz_unterzentrum
+ )
+ 
+ 
+ interaktive_karte_distanz_unterzentrum <- leaflet(model_data_complete_wgs) %>%
+   addProviderTiles("CartoDB.Positron") %>%
+   setView(lng = 11.5761, lat = 48.1371, zoom = 11) %>%
+   addPolylines(data = wohnlage_grenzen_wgs, color = "black", weight = 0.5)%>% 
+   addCircleMarkers(
+     fillColor = ~pal(distanz_unterzentrum),
+     fillOpacity = 1,
+     color = "black",
+     stroke = TRUE,
+     weight = 1,
+     radius = 4,
+     label = ~paste("Distanz zum Unterzentrum:", round(distanz_unterzentrum, 2))
+   ) %>%
+   addLegend(
+     "bottomright",
+     pal = pal,
+     values = ~distanz_unterzentrum,
+     title = "Distanz zum Unterzentrum (in m)",
+     opacity = 1
+   )
+ 
+ # Speichern als html
+ saveWidget(interaktive_karte_distanz_unterzentrum,
+            file = "interaktive_karten/variablen/interaktive_karte_distanz_unterzentrum.html",
+            selfcontained = TRUE)
+ browseURL("interaktive_karten/variablen/interaktive_karte_distanz_unterzentrum.html")
+ 
+ 
+ 
+ 
